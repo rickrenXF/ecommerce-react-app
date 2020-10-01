@@ -5,7 +5,7 @@ import { useLocation, Redirect } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Link from "@material-ui/core/Link";
 
-import { email, required, name } from "../../form/validation";
+import { email, required, name, password } from "../../form/validation";
 import RFTextField from "../../form/RFTextField";
 import FormButton from "../../form/FormButton";
 import FormFeedback from "../../form/FormFeedback";
@@ -28,12 +28,14 @@ const deaultValues = {
   name: "",
   email: "",
   password: "",
+  passwordConfirm: "",
 };
 
 const deaultErrors = {
   name: undefined,
   email: undefined,
   password: undefined,
+  passwordConfirm: undefined,
 };
 
 const SignUp = (authenticate) => {
@@ -67,16 +69,32 @@ const SignUp = (authenticate) => {
   };
 
   const validate = () => {
-    const validateErrors = required(["email", "password", "name"], values);
+    const validateErrors = required(
+      ["email", "password", "name", "password", "passwordConfirm"],
+      values
+    );
 
-    if (!validateErrors.email || !validateErrors.name) {
+    if (
+      !validateErrors.email ||
+      !validateErrors.name ||
+      !validateErrors.password ||
+      !validateErrors.passwordConfirm
+    ) {
       const emailError = email(values.email, values);
       const nameError = name(values.name, values);
+      const passwordError = password(values.password, values);
       if (emailError) {
         validateErrors.email = email(values.email, values);
       }
       if (nameError) {
         validateErrors.name = name(values.name, values);
+      }
+      if (passwordError) {
+        validateErrors.password = password(values.password, values);
+      }
+      if (values.password != values.passwordConfirm) {
+        validateErrors.passwordConfirm =
+          "Password and Password Confirmation must be the same.";
       }
     }
 
@@ -94,7 +112,8 @@ const SignUp = (authenticate) => {
       const resp = await authenticate(
         values.email,
         values.password,
-        values.name
+        values.name,
+        values.passwordConfirm
       );
       setSubmitting(false);
       if (resp.status === 200) {
@@ -169,13 +188,13 @@ const SignUp = (authenticate) => {
           size="large"
           onChange={handleChange}
           disabled={submitting}
-          error={errors.password}
-          name="password"
+          error={errors.passwordConfirm}
+          name="passwordConfirm"
           autoComplete="current-password"
           label="Password Confirmation"
           type="password"
           margin="normal"
-          value={values.password}
+          value={values.passwordConfirm}
         />
         {/* 不太知道怎么显示这个feedback出来 */}
         {submitError ? (
