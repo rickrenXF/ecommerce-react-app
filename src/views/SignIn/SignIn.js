@@ -156,7 +156,7 @@ function SignIn({ authenticate }) {
               margin="normal"
               value={values.password}
             />
-            {/* 不太知道怎么限时这个feedback出来 */}
+
             {submitError ? (
               <FormFeedback className={classes.feedback} error>
                 {submitError}
